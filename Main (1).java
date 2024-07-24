@@ -1,0 +1,98 @@
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+class Produto {
+    private String nome;
+    private double preco;
+
+    public Produto(String nome, double preco) {
+        this.nome = nome;
+        this.preco = preco;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public double getPreco() {
+        return preco;
+    }
+
+    public String etiquetaPreco() {
+        return String.format("%s - R$ %.2f", nome, preco);
+    }
+}
+
+class ProdutoImportado extends Produto {
+    private double taxaAlfandega;
+
+    public ProdutoImportado(String nome, double preco, double taxaAlfandega) {
+        super(nome, preco);
+        this.taxaAlfandega = taxaAlfandega;
+    }
+
+    @Override
+    public String etiquetaPreco() {
+        return String.format("%s - R$ %.2f (Taxa alfândega: R$ %.2f)", getNome(), getPreco() + taxaAlfandega, taxaAlfandega);
+    }
+}
+
+class ProdutoUsado extends Produto {
+    private String dataFabricacao;
+
+    public ProdutoUsado(String nome, double preco, String dataFabricacao) {
+        super(nome, preco);
+        this.dataFabricacao = dataFabricacao;
+    }
+
+    @Override
+    public String etiquetaPreco() {
+        return String.format("%s (usado) - R$ %.2f (Data de fabricação: %s)", getNome(), getPreco(), dataFabricacao);
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        List<Produto> produtos = new ArrayList<>();
+
+        System.out.print("Quantos produtos você deseja cadastrar? ");
+        int n = sc.nextInt();
+
+        for (int i = 0; i < n; i++) {
+            System.out.print("Tipo do produto (comum/importado/usado): ");
+            String tipoProduto = sc.next();
+            System.out.print("Nome do produto: ");
+            sc.nextLine(); // Consumir quebra de linha pendente
+            String nome = sc.nextLine();
+            System.out.print("Preço do produto: ");
+            double preco = sc.nextDouble();
+
+            switch (tipoProduto) {
+                case "importado":
+                    System.out.print("Taxa de alfândega: ");
+                    double taxaAlfandega = sc.nextDouble();
+                    produtos.add(new ProdutoImportado(nome, preco, taxaAlfandega));
+                    break;
+                case "usado":
+                    System.out.print("Data de fabricação (DD/MM/AAAA): ");
+                    sc.nextLine(); // Consumir quebra de linha pendente
+                    String dataFabricacao = sc.nextLine();
+                    produtos.add(new ProdutoUsado(nome, preco, dataFabricacao));
+                    break;
+                case "comum":
+                default:
+                    produtos.add(new Produto(nome, preco));
+                    break;
+            }
+        }
+
+        System.out.println("\nEtiquetas de Preço dos Produtos:");
+        for (Produto produto : produtos) {
+            System.out.println(produto.etiquetaPreco());
+        }
+
+        sc.close();
+    }
+}
